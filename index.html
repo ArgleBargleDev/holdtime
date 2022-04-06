@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head><title>⏱️ Hold Time Checker</title></head>
+<body>
+
+<script>
+var StartTimestamp = 0;
+
+document.addEventListener("mousedown", () =>
+{
+	document.body.style.backgroundColor = "#CCCCCC";
+	StartTimestamp = Date.now();
+	document.getElementById("report").innerHTML = "⏱️";
+});
+
+document.addEventListener("mouseup", () =>
+{
+	document.body.style.backgroundColor = "#FFFFFF";
+	var HoldTime = Date.now() - StartTimestamp;
+	document.getElementById("report").innerHTML = "<b>" + HoldTime + "</b><font size='4px'>ms</font>";
+	if (navigator && navigator.clipboard && navigator.clipboard.writeText)
+		navigator.clipboard.writeText(HoldTime);
+});
+
+</script>
+
+<style>
+div {
+	font-family: Helvetica, sans-serif;
+	font-size:40px;
+	width:100%;
+	height:100%;
+	position:fixed;
+	top:50%;
+	text-align:center;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+</style>
+
+<div id="report"><b>Click Anywhere</b><br><font size="4px">(Time will be copied to clipboard)</font></div>
+
+</body>
+</html>
