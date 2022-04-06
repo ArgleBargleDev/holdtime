@@ -1,39 +1,68 @@
 <!DOCTYPE html>
 <html>
-<head><title>⏱️ Hold Time Checker</title></head>
+<head>
+<title>⏱️ Hold Time Checker</title>
+<meta charset="utf-8">
+</head>
 <body>
 
 <script>
-document.addEventListener('keydown', TimerStart);
-document.addEventListener('mousedown', TimerStart);
-document.addEventListener('keyup', TimerStop);
-document.addEventListener('mouseup', TimerStop);
+document.addEventListener('keydown', timerStart);
+document.addEventListener('mousedown', timerStart);
+document.addEventListener('keyup', timerStop);
+document.addEventListener('mouseup', timerStop);
 
 var StartTimestamp = 0;
 var KeyIsPressed = false;
+var Gamepad;
+var GamepadIsPressed = false;
 
-function TimerStart()
+function timerStart(Timestamp)
 {
 	if (KeyIsPressed)
 		return;
 
 	document.body.style.backgroundColor = "#CCCCCC";
-	StartTimestamp = Date.now();
+	StartTimestamp = Timestamp > 0 ? Timestamp : Date.now();
 	document.getElementById("report").innerHTML = "⏱️";
 	KeyIsPressed = true;
 }
 
-function TimerStop()
+function timerStop(Timestamp)
 {
 	if (!KeyIsPressed)
 		return;
 
 	document.body.style.backgroundColor = "#FFFFFF";
-	var HoldTime = Date.now() - StartTimestamp;
+	var HoldTime = (Timestamp > 0 ? Timestamp : Date.now()) - StartTimestamp;
 	document.getElementById("report").innerHTML = "<b>" + HoldTime + "</b><font size='4px'>ms</font>";
 	if (navigator && navigator.clipboard && navigator.clipboard.writeText)
 		navigator.clipboard.writeText(HoldTime);
 	KeyIsPressed = false;
+}
+
+window.addEventListener("gamepadconnected", function(event) {
+	Gamepad = event.gamepad;
+	checkGamepad();
+});
+
+function checkGamepad()
+{
+	if (Gamepad == undefined || !Gamepad.connected)
+		return;
+
+	if (Gamepad.buttons.some((button) => button.pressed))
+	{
+		timerStart(Gamepad.timestamp);
+		GamepadIsPressed = true;
+	}
+	else if (GamepadIsPressed)
+	{
+		timerStop(Gamepad.timestamp);
+		GamepadIsPressed = false;
+	}
+
+	requestAnimationFrame(checkGamepad);
 }
 
 </script>
@@ -56,7 +85,7 @@ div {
 }
 </style>
 
-<div id="report"><b>Press Any Key</b><br><font size="4px">(Time will be copied to clipboard)</font></div>
+<div id="report"><b>Press Any Button</b><br><font size="4px">(Time will be copied to clipboard)</font></div>
 
 </body>
 </html>
