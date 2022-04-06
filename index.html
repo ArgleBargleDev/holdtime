@@ -4,23 +4,37 @@
 <body>
 
 <script>
-var StartTimestamp = 0;
+document.addEventListener('keydown', TimerStart);
+document.addEventListener('mousedown', TimerStart);
+document.addEventListener('keyup', TimerStop);
+document.addEventListener('mouseup', TimerStop);
 
-document.addEventListener("mousedown", () =>
+var StartTimestamp = 0;
+var KeyIsPressed = false;
+
+function TimerStart()
 {
+	if (KeyIsPressed)
+		return;
+
 	document.body.style.backgroundColor = "#CCCCCC";
 	StartTimestamp = Date.now();
 	document.getElementById("report").innerHTML = "⏱️";
-});
+	KeyIsPressed = true;
+}
 
-document.addEventListener("mouseup", () =>
+function TimerStop()
 {
+	if (!KeyIsPressed)
+		return;
+
 	document.body.style.backgroundColor = "#FFFFFF";
 	var HoldTime = Date.now() - StartTimestamp;
 	document.getElementById("report").innerHTML = "<b>" + HoldTime + "</b><font size='4px'>ms</font>";
 	if (navigator && navigator.clipboard && navigator.clipboard.writeText)
 		navigator.clipboard.writeText(HoldTime);
-});
+	KeyIsPressed = false;
+}
 
 </script>
 
@@ -42,7 +56,7 @@ div {
 }
 </style>
 
-<div id="report"><b>Click Anywhere</b><br><font size="4px">(Time will be copied to clipboard)</font></div>
+<div id="report"><b>Press Any Key</b><br><font size="4px">(Time will be copied to clipboard)</font></div>
 
 </body>
 </html>
